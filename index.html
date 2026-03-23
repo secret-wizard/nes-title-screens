@@ -1,0 +1,47 @@
+<!-- NES TITLE SCREEN -->
+<style>
+  .image {
+    height:480px;
+    width:auto;
+    max-width:100%;
+    object-fit:cover;
+    object-position:center;
+  }
+</style>
+
+<img id="poster" class="image image-dither" alt="NES Title Screen">
+
+<!-- LOGIC -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    /* Tell TRMNL to drop bleed & center contents */
+    const screen = document.querySelector('.screen');
+    if (screen) {
+      screen.classList.add(
+        'screen--no-bleed',
+        'layout', 'layout--center'
+      );
+    }
+
+    /* Fetch images.json → pick random → display */
+    const jsonUrl = 'https://raw.githubusercontent.com/secret-wizard/nes-title-screens/main/images.json';
+
+    function shuffle(a){
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    fetch(jsonUrl)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(d => {
+        if (!d.images?.length) throw 'empty list';
+        document.getElementById('poster').src = shuffle(d.images)[0];
+        console.log('[TRMNL-NES-Screens] title screen set');
+      })
+      .catch(e => console.error('[TRMNL-NES-Screens] fetch error:', e));
+  });
+</script>
