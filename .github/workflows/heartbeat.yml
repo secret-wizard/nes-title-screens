@@ -1,0 +1,69 @@
+name: Update heartbeat.json
+
+permissions:
+  contents: write          # allow pushes
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # every 10 min
+  workflow_dispatch:
+
+concurrency:
+  group: heartbeat-json
+  cancel-in-progress: false   # queue; don't cancel
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4     # auto-kill if the job hangs >4 min
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false    # we'll inject our own remote URL
+
+      - name: Configure git credentials
+        run: |
+          git remote set-url origin \
+            https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Build heartbeat with random image
+        run: |
+          node - <<'SCRIPT'
+          const fs = require('fs');
+
+          // Pick one random element from an array
+          function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+          }
+
+          const data = JSON.parse(fs.readFileSync('images.json', 'utf8'));
+          const list = data.images || [];
+
+          if (list.length === 0) {
+            console.error('[heartbeat] images.json is empty');
+            process.exit(1);
+          }
+
+          const heartbeat = {
+            timestamp: Date.now(),
+            images: {
+              all: pickRandom(list)
+            }
+          };
+
+          fs.writeFileSync('heartbeat.json', JSON.stringify(heartbeat));
+          console.log('[heartbeat] heartbeat.json updated with image URL');
+          console.log(JSON.stringify(heartbeat, null, 2));
+          SCRIPT
+
+      - name: Commit & push
+        run: |
+          git add heartbeat.json
+          git commit -m "chore: bump heartbeat 🫀" || echo "Nothing to commit"
+          git pull --rebase origin main   # rebases if the branch advanced
+          git push origin HEAD:main

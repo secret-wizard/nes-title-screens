@@ -1,0 +1,5 @@
+- keyname: about
+  name: About This Plugin
+  field_type: author_bio
+  description: NES Title Screens™ is an image-based plugin for retro gaming fans, randomly cycling through 577 classic Nintendo Entertainment System title screens. Created by Quaid — @quaid1 on Discord.
+  github_url: https://github.com/secret-wizard/nes-title-screens
