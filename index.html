@@ -1,27 +1,36 @@
 <!-- NES TITLE SCREEN -->
 <style>
+  .nes-wrapper {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:100%;
+    background:#000;
+  }
   .image {
-    height:480px;
+    height:100%;
     width:auto;
     max-width:100%;
-    object-fit:cover;
+    object-fit:contain;
     object-position:center;
   }
 </style>
 
-<img id="poster" class="image image-dither" alt="NES Title Screen">
+<div class="nes-wrapper">
+  <img id="poster" class="image image-dither" alt="NES Title Screen">
+</div>
 
 <!-- LOGIC -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
 
-    /* Tell TRMNL to drop bleed & center contents */
+    /* Full-bleed black background, centered image */
     const screen = document.querySelector('.screen');
     if (screen) {
-      screen.classList.add(
-        'screen--no-bleed',
-        'layout', 'layout--center'
-      );
+      screen.style.background = '#000';
+      screen.style.padding = '0';
+      screen.style.margin = '0';
     }
 
     /* Fetch images.json → pick random → display */
