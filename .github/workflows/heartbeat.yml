@@ -57,7 +57,7 @@ jobs:
           };
 
           fs.writeFileSync('heartbeat.json', JSON.stringify(heartbeat));
-          console.log('[heartbeat] heartbeat.json updated');
+          console.log('[heartbeat] heartbeat.json updated with image URL');
           console.log(JSON.stringify(heartbeat, null, 2));
           SCRIPT
 

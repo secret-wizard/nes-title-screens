@@ -1,78 +1,49 @@
-<!-- ============================================
-     NES Title Screens — TRMNL Plugin Markup
-     No decade selector; uses images.all from heartbeat.json
-     ============================================ -->
-
-<!-- ==================== MARKUP FULL ==================== -->
 <!-- POSTER -->
 <style>
   .image {
-    height: 480px;
-    width: auto;
-    max-width: 100%;
-    object-fit: cover;
-    object-position: center;
+    height:480px;
+    width:auto;
+    max-width:100%;
+    object-fit:cover;
+    object-position:center;
   }
 </style>
-<img class="image image-dither" alt="NES Title Screen" src="{{ images.all }}">
 
-<!-- ==================== MARKUP HALF HORIZONTAL ==================== -->
-<!-- POSTER -->
-<style>
-  .image {
-    height: 100%;
-    width: 100%;
-    max-width: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-</style>
-<img class="image image-dither" alt="NES Title Screen" src="{{ images.all }}">
+<img id="poster" class="image image-dither" alt="NES Title Screen">
 
-<!-- ==================== MARKUP HALF VERTICAL ==================== -->
-<!-- POSTER -->
-<style>
-  .view.view--half_vertical {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    background: #000;
-  }
-  .view--half_vertical .image {
-    width: 100%;
-    height: auto;
-    max-height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-</style>
-<img class="image image-dither" alt="NES Title Screen" src="{{ images.all }}">
+<!-- LOGIC -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
 
-<!-- ==================== MARKUP QUADRANT ==================== -->
-<!-- POSTER -->
-<style>
-  .view.view--quadrant {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    background: #000;
-  }
-  .view--quadrant .image {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-</style>
-<img class="image image-dither" alt="NES Title Screen" src="{{ images.all }}">
+    /* 0️⃣  Tell TRMNL to drop bleed & center contents */
+    const screen = document.querySelector('.screen');
+    if (screen) {
+      screen.classList.add(
+        'screen--no-bleed',     // removes 10 px padding
+        'layout', 'layout--center'  // centers child both axes
+      );
+    }
 
-<!-- ==================== MARKUP SHARED ==================== -->
-<style>
-  .screen {
-    --gap: 0 !important;
-  }
-</style>
+    /* 1️⃣  Build URL for images.json */
+    const jsonUrl = 'https://raw.githubusercontent.com/secret-wizard/nes-title-screens/main/images.json';
+
+    /* 2️⃣  Tiny shuffle helper */
+    function shuffle(a){
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* 3️⃣  Fetch → Pick → Display */
+    fetch(jsonUrl)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(d => {
+        if (!d.images?.length) throw 'empty list';
+        document.getElementById('poster').src = shuffle(d.images)[0];
+        console.log('[TRMNL-NES-Screens] title screen set');
+      })
+      .catch(e => console.error('[TRMNL-NES-Screens] fetch error:', e));
+  });
+</script>
